@@ -28,6 +28,8 @@ namespace Calculator
             InitializeComponent();
 
             calKeyPressProcess.ResetCalculation(DisplayCallback);
+
+            CalNumberClass.calResult = 105;
         }
 
         #region １。 数字キー 0~9、 小数点、 バックスペース Event処理 
