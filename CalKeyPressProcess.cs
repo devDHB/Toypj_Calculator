@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Calculator
 {
-
     /// <summary>
     /// Calculator キーの入力処理クラス。
     /// </summary>
@@ -22,7 +21,6 @@ namespace Calculator
         /// 現在計算された結果値を表示する文字テキスト。
         /// </summary>
         string strCalResult { get; set; } = "";
-
 
         /// <summary>
         /// 現在入力された数字、小数点を表示する文字テキスト。
