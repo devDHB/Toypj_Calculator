@@ -29,7 +29,13 @@ namespace Calculator
 
             calKeyPressProcess.ResetCalculation(DisplayCallback);
 
-            CalNumberClass.calResult = 105;
+            //CalNumberClass.calResult = 105;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // 폼이 로드될 때 실행할 코드
+            MessageBox.Show("Form Loaded");
         }
 
         #region １。 数字キー 0~9、 小数点、 バックスペース Event処理 
@@ -79,8 +85,7 @@ namespace Calculator
         /// <param name="e"></param>
         void Btn4KindOperatorPress_Event(object sender, EventArgs e)
         {
-            string strOperator = "";
-            strOperator = (sender as Button).Text;
+            string strOperator = (string)(sender as Button).Tag;
 
             calKeyPressProcess.CalOperatorProcess(strOperator, DisplayCallback);
         }

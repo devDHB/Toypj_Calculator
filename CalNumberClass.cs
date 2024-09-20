@@ -167,7 +167,15 @@ namespace Calculator
         {
             try
             {
-                calResult -= leftNumberA;
+                if (lastCalOperator == _CalOperator._none && calResult == 0)
+                {
+                    // 計算機初期化後最初演算子が入力された場合、該当入力値を解散値に設定。
+                    calResult = leftNumberA;
+                }
+                else
+                {
+                    calResult -= leftNumberA;
+                }
                 return true;
             }
             catch (Exception ex)

@@ -41,6 +41,8 @@ namespace Calculator
             strCalResult = "";
             strInputNumber = "0";
 
+            CalNumberClass.ClearCalculation();
+
             dispCallBack(strCalHistory, strInputNumber);
         }
 
@@ -69,8 +71,16 @@ namespace Calculator
         public void AddNumber(string strNum, Action<string, string> dispCallBack)
         {
             // 全部初期化後、最初入力時は「strInputText」に今入力した値が入力される。
-            if (strInputNumber == "0") { 
+            if (strInputNumber == "0" || is4KindOperatorTriggeredOn == true) 
+            { 
+                // 現在入力された数字を入力文字に設定する。
                 strInputNumber = strNum;
+
+                if (is4KindOperatorTriggeredOn == true)
+                {
+                    // 四則演算子のflagがtrueならfalseに初期化する。
+                    is4KindOperatorTriggeredOn = false;
+                }
             } else
             {
                 strInputNumber += strNum;
@@ -126,15 +136,140 @@ namespace Calculator
         #region 3. 四則演算のキーの入力を処理するメソッド。
 
         /// <summary>
+        /// 현재 입력된 연산자 Tag를 체크하여 계산에 사용될 오퍼레이터를 얻는다
+        /// </summary>
+        /// <param name="strOperator"></param>
+        /// <returns></returns>
+        _CalOperator GetOperator(string strOperator)
+        {
+            _CalOperator result = _CalOperator._none;
+
+            switch(strOperator)
+            {
+                case "_plus":
+                    result = _CalOperator._plus;
+                    break;
+                case "_minus":
+                    result = _CalOperator._minus;
+                    break;
+                case "_multiple":
+                    result = _CalOperator._multiple;
+                    break;
+                case "_divide":
+                    result = _CalOperator._divide;
+                    break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 現在設定された演算子を画面に表示するため記号を得る
+        /// </summary>
+        /// <param name="calOperator"></param>
+        /// <returns></returns>
+        string GetOperatorString(_CalOperator calOperator)
+        {
+            string result = "";
+            switch (calOperator)
+            {
+                case _CalOperator._plus:
+                    result = "+";
+                    break;
+                case _CalOperator._minus:
+                    result = "-";
+                    break;
+                case _CalOperator._multiple:
+                    result = "*";
+                    break;
+                case _CalOperator._divide:
+                    result = "/ ";
+                    break;
+            }
+            return ""; // return = string.Empty;
+        }
+
+        /// <summary>
         /// 四則演算のキーを押下する時呼び出すメソッド。
         /// + - * /
         /// </summary>
         /// <param name="dispCallBack"></param>
         public void CalOperatorProcess(string strCalOperator, Action<string, string> dispCallBack)
         {
+
+            
+
+            // 現在入力された演算子を計算機クラスに設定する。
+            CalNumberClass.SetOperator(GetOperator(strCalOperator));
+            
+            if (is4KindOperatorTriggeredOn != true)
+            {
+                is4KindOperatorTriggeredOn = true;
+            }
+            
+            // 演算子計算処理をする。
+            CalculationProcess();
+
+            // 直前s入力した計算の情報をテキストで生成。
+            strCalHistory = string.Format("{0} {1}", CalNumberClass.calResult, GetOperatorString(CalNumberClass.currentCalOperator));
+
+            // 直前入力した値または計算結果をテキストで生成。
+            strInputNumber = CalNumberClass.calResult.ToString();
+
+
             // 画面の情報をCallback関数で更新。
             dispCallBack(strCalHistory, strInputNumber);
         }
+
+
+        /// <summary>
+        /// 四則演算子ボタンを押したかチェック
+        /// 1. 設定:四則演算子入力時True
+        /// 2. 解体:数字0~9、小数点·イコール·クリアが入力されたら解除False
+        /// </summary>
+        bool is4KindOperatorTriggeredOn { get; set; } = false;
+
+
+        bool CalculationProcess()
+        {
+            CalNumberClass clnc = GetCalculationMethod(CalNumberClass.currentCalOperator);
+
+            decimal inputNumber = 0;
+            if (decimal.TryParse(strInputNumber,out inputNumber)) {
+                clnc.Calculation(inputNumber);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 伝達された四則演算子の種類によって計算を進める
+        /// 子クラスインスタンスを生成して得る。
+        /// </summary>
+        /// <param name="calOperator"></param>
+        /// <returns></returns>
+        CalNumberClass GetCalculationMethod(_CalOperator calOperator)
+        {
+            CalNumberClass clnc = null;
+            switch (calOperator)
+            {
+                case _CalOperator._plus:
+                    clnc = new Plus();
+                    break;
+                case _CalOperator._minus:
+                    clnc = new Minus();
+                    break;
+                case _CalOperator._multiple:
+                    clnc = new Multiple();
+                    break;
+                case _CalOperator._divide:
+                    clnc = new Divide();
+                    break;
+            }
+            return clnc;
+        }
+
+
 
         #endregion
 
